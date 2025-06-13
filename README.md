@@ -1,6 +1,6 @@
 # PlayCorner Backend API
 
-![Go Version](https://img.shields.io/badge/Go-1.24-00ADD8.svg?style=flat-square)
+![Go Version](https://img.shields.io/badge/Go-1.21-00ADD8.svg?style=flat-square)
 ![Docker](https://img.shields.io/badge/Docker-24.0-2496ED.svg?style=flat-square)
 ![Nginx](https://img.shields.io/badge/Nginx-1.25-009639.svg?style=flat-square)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791.svg?style=flat-square)
@@ -22,7 +22,27 @@ Dokumentasi API lengkap yang menjelaskan setiap *endpoint*, skema, dan contoh pe
 
 **[Lihat Dokumentasi API PlayCorner](https://api.playcorner.einrafh.com/docs/introduction)**
 
-*(Catatan: Ganti dengan URL domain produksi Zudoku Anda jika berbeda)*
+### Menjalankan Dokumentasi Lokal
+Proyek dokumentasi API (dibuat dengan Zudoku) berada di dalam folder `/docs`. Untuk menjalankan atau membangunnya:
+
+1.  **Masuk ke folder `docs`:**
+    ```bash
+    cd docs
+    ```
+
+2.  **Install dependensi (hanya untuk pertama kali):**
+    ```bash
+    npm install
+    ```
+
+3.  **Jalankan server development atau build:**
+    ```bash
+    # Untuk menjalankan server development di http://localhost:3000
+    npm run dev
+
+    # Atau, untuk membangun versi produksi statis ke dalam folder /dist
+    npm run build
+    ```
 
 ## 🏗️ Struktur Proyek
 Proyek ini mengikuti struktur layout standar Go untuk skalabilitas dan keterbacaan.
@@ -96,4 +116,3 @@ Semua hak dilindungi undang-undang. Dilarang memperbanyak, mendistribusikan, ata
 
 ---
 Dibuat dengan ❤️ di FILKOM.
-
