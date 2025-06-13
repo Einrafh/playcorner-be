@@ -82,7 +82,6 @@ Salin file `.env.example` menjadi `.env`. File ini akan digunakan oleh Docker Co
 ```bash
 cp .env.example .env
 ```
-Anda bisa mengubah nilai di dalam `.env` jika perlu, tetapi pengaturan default sudah cukup untuk development.
 
 **3. Jalankan dengan Docker Compose**
 Perintah ini akan membangun *image* aplikasi, mengunduh *image* PostgreSQL & Nginx, lalu menjalankan semua layanan secara bersamaan.
