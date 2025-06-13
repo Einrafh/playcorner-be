@@ -1,0 +1,26 @@
+---
+title: "Selamat Datang di Dokumentasi PlayCorner"
+---
+
+Terima kasih telah menggunakan API PlayCorner! Dokumentasi ini akan memandu Anda dalam menggunakan semua layanan yang tersedia untuk berinteraksi dengan sistem peminjaman Game Corner FILKOM.
+
+## Apa itu PlayCorner API?
+
+PlayCorner API adalah antarmuka RESTful yang memungkinkan Anda untuk:
+- Mengakses informasi **pengguna** secara aman.
+- Melihat daftar **TV** dan **game** yang tersedia.
+- Mengecek **ketersediaan slot waktu** untuk setiap TV secara *real-time*.
+- Membuat dan melihat riwayat **reservasi**.
+
+## Memulai
+
+Untuk mulai menggunakan API, langkah pertama adalah **mengautentikasi** permintaan Anda.
+
+:::tip[Butuh Referensi Cepat?]
+Seluruh detail teknis untuk setiap *endpoint*, termasuk *request body*, *response schema*, dan contoh, dapat ditemukan di **[Halaman Referensi API Lengkap](/api)**.
+:::
+
+## Alur Penggunaan Dasar
+1.  **Login**: Lakukan permintaan `POST` ke endpoint `/api/auth/login` untuk mendapatkan `authToken`.
+2.  **Gunakan Token**: Sertakan `authToken` yang Anda dapatkan sebagai *Bearer Token* di *header* `Authorization` untuk semua permintaan ke *endpoint* yang terproteksi.
+3.  **Jelajahi API**: Gunakan *endpoint* lain untuk melihat TV, mengecek ketersediaan, atau membuat reservasi.

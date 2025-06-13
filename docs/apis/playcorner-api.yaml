@@ -1,0 +1,393 @@
+openapi: 3.0.3
+info:
+  title: "PlayCorner API"
+  description: |-
+    Dokumentasi API resmi untuk layanan peminjaman Game Corner di Fakultas Ilmu Komputer (FILKOM).
+    API ini menangani otentikasi pengguna, informasi TV dan Game, serta proses reservasi.
+  contact:
+    name: "PlayCorner Dev Team"
+    email: "dev@playcorner.example.com"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:3000"
+    description: "Server Development Lokal"
+tags:
+  - name: "Authentication"
+    description: "Operasi terkait login dan otentikasi pengguna"
+  - name: "User"
+    description: "Operasi untuk mengelola data pengguna"
+  - name: "TV & Game Corner"
+    description: "Operasi untuk melihat TV, Game, dan membuat reservasi"
+
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - "Authentication"
+      summary: "Login Pengguna"
+      description: "Mengautentikasi pengguna dengan NIM dan password, lalu mengembalikan token JWT."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: "Login berhasil"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseTokenCarrier"
+        "401":
+          description: "Unauthorized - NIM atau password salah"
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - "Authentication"
+      summary: "Refresh Auth Token"
+      description: "Memperbarui `authToken` menggunakan `refreshToken` yang ada di HTTP-only cookie."
+      responses:
+        "200":
+          description: "Token berhasil diperbarui"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseTokenCarrier"
+        "401":
+          description: "Unauthorized - Refresh token tidak valid atau tidak ditemukan"
+
+  /api/users/{userId}:
+    get:
+      tags:
+        - "User"
+      summary: "Dapatkan Info User"
+      description: "Mengambil informasi detail seorang pengguna berdasarkan NIM-nya. Memerlukan otentikasi."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          description: "NIM pengguna yang ingin dicari."
+          schema:
+            type: "string"
+            example: "235150207111062"
+      responses:
+        "200":
+          description: "Data user berhasil diambil"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseUser"
+        "404":
+          description: "User tidak ditemukan"
+
+  /api/users/{userId}/histories:
+    get:
+      tags:
+        - "User"
+      summary: "Dapatkan Riwayat Peminjaman User"
+      description: "Mengambil seluruh riwayat peminjaman seorang pengguna. Memerlukan otentikasi."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          description: "NIM pengguna."
+          schema:
+            type: "string"
+            example: "235150207111062"
+      responses:
+        "200":
+          description: "Riwayat berhasil diambil"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseHistoryArray"
+
+  /api/tvs:
+    get:
+      tags:
+        - "TV & Game Corner"
+      summary: "Dapatkan Semua TV dan Gamenya"
+      description: "Mengambil daftar semua TV yang tersedia, lengkap dengan game yang ada di masing-masing TV."
+      responses:
+        "200":
+          description: "Daftar TV berhasil diambil"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseTVInfoArray"
+
+  /api/tvs/{tvId}/reservations:
+    get:
+      tags:
+        - "TV & Game Corner"
+      summary: "Dapatkan Status Reservasi TV"
+      description: "Mengambil status ketersediaan semua slot waktu untuk TV tertentu pada hari ini."
+      parameters:
+        - name: "tvId"
+          in: "path"
+          required: true
+          description: "ID dari TV yang ingin dicek."
+          schema:
+            type: "integer"
+            example: 1
+      responses:
+        "200":
+          description: "Status TV berhasil diambil"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseTVStatus"
+        "404":
+          description: "TV tidak ditemukan"
+    post:
+      tags:
+        - "TV & Game Corner"
+      summary: "Buat Reservasi Baru"
+      description: "Membuat reservasi baru untuk sebuah TV pada slot waktu tertentu. Memerlukan otentikasi."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: "tvId"
+          in: "path"
+          required: true
+          description: "ID dari TV yang ingin dipesan."
+          schema:
+            type: "integer"
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationBody"
+      responses:
+        "201":
+          description: "Reservasi berhasil dibuat"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponseNull"
+        "401":
+          description: "Unauthorized - Token tidak valid"
+        "409":
+          description: "Conflict - Slot waktu sudah dipesan"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: "http"
+      scheme: "bearer"
+      bearerFormat: "JWT"
+  schemas:
+    User:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "NIM unik dari mahasiswa."
+          example: "235150207111062"
+        name:
+          type: "string"
+          description: "Nama lengkap mahasiswa."
+          example: "Muhammad Rafly Ash Shiddiqi"
+        faculty:
+          type: "string"
+          description: "Fakultas mahasiswa."
+          example: "FILKOM"
+        major:
+          type: "string"
+          description: "Jurusan mahasiswa."
+          example: "Teknik Informatika"
+        creditScore:
+          type: "integer"
+          description: "Skor kredit mahasiswa untuk peminjaman."
+          example: 100
+        profilePictUrl:
+          type: "string"
+          format: "uri"
+          description: "URL ke foto profil mahasiswa."
+          example: "https://i.pravatar.cc/150?u=235150207111062"
+
+    Game:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          description: "ID unik dari game."
+          example: 1
+        title:
+          type: "string"
+          description: "Judul game."
+          example: "EA Sports FC 24"
+        coverPictUrl:
+          type: "string"
+          format: "uri"
+          description: "URL ke gambar sampul game."
+          example: "https://placehold.co/200x300/3498DB/FFFFFF?text=FC+24"
+
+    TVInfo:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          description: "ID unik dari TV."
+          example: 1
+        consoleType:
+          type: "string"
+          description: "Tipe konsol dari TV."
+          example: "PlayStation 5"
+        gameList:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Game"
+
+    History:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          example: 101
+        tvId:
+          type: "integer"
+          example: 1
+        reservationDateTime:
+          type: "string"
+          format: "date-time"
+          example: "2025-06-13T10:00:00Z"
+        tvPictUrl:
+          type: "string"
+          format: "uri"
+          example: "https://placehold.co/600x400/?text=TV+1"
+
+    TimeSlot:
+      type: "object"
+      properties:
+        startTime:
+          type: "string"
+          format: "date-time"
+        endTime:
+          type: "string"
+          format: "date-time"
+        availability:
+          type: "string"
+          enum: ["available", "unavailable", "unknown"]
+
+    TVStatus:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        consoleType:
+          type: "string"
+        timeSlots:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+
+    LoginBody:
+      type: "object"
+      properties:
+        identifier:
+          type: "string"
+          example: "235150207111062"
+        password:
+          type: "string"
+          example: "password123"
+
+    ReservationBody:
+      type: "object"
+      properties:
+        tvId:
+          type: "integer"
+          example: 1
+        timeslot:
+          type: "string"
+          format: "date-time"
+          example: "2025-06-14T09:00:00Z"
+
+    TokenCarrier:
+      type: "object"
+      properties:
+        authToken:
+          type: "string"
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjM..."
+        userId:
+          type: "string"
+          example: "235150207111062"
+        expireDate:
+          type: "string"
+          format: "date-time"
+
+    # -- Skema Pembungkus (Wrapper) untuk Response --
+    ApiResponse:
+      type: "object"
+      properties:
+        code:
+          type: "integer"
+        status:
+          type: "string"
+        data:
+          type: "object"
+
+    ApiResponseTokenCarrier:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/TokenCarrier'
+
+    ApiResponseUser:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/User'
+
+    ApiResponseHistoryArray:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: "array"
+              items:
+                $ref: '#/components/schemas/History'
+
+    ApiResponseTVInfoArray:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: "array"
+              items:
+                $ref: '#/components/schemas/TVInfo'
+
+    ApiResponseTVStatus:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/TVStatus'
+
+    ApiResponseNull:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: "object"
+              nullable: true
+              example: null
