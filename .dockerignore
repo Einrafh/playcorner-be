@@ -1,0 +1,28 @@
+# .dockerignore
+
+# Abaikan file environment. Variabel akan dimasukkan oleh docker-compose.
+.env
+
+# Abaikan file-file Git
+.git
+.gitignore
+
+# Abaikan file-file Docker itu sendiri
+Dockerfile
+docker-compose.yml
+
+# Abaikan file-file yang dihasilkan oleh sistem operasi
+.DS_Store
+Thumbs.db
+
+# Abaikan hasil kompilasi lokal (jika ada)
+*.exe
+*.out
+/main
+
+# Abaikan direktori vendor jika Anda menggunakannya
+/vendor
+
+# Abaikan file-file konfigurasi IDE
+.idea
+.vscode

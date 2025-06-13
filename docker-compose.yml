@@ -1,0 +1,50 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  app:
+    # Membangun image dari Dockerfile di direktori saat ini
+    build: .
+    container_name: playcorner-app
+    # Memuat semua variabel dari file .env
+    env_file:
+      - ./.env
+    # Memetakan port 2000 di host ke port 3000 di container
+    ports:
+      - "2000:3000"
+    # Memastikan service 'db' berjalan dan siap sebelum 'app' dimulai
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Layanan untuk database PostgreSQL
+  db:
+    # Menggunakan image resmi PostgreSQL
+    image: postgres:15-alpine
+    container_name: playcorner-db
+    # Memuat environtment
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      TZ: Asia/Jakarta
+    # Memuat variabel dari file .env untuk mengkonfigurasi database
+    env_file:
+      - ./.env
+    # Memetakan port 5101 di host ke port 5432 di container
+    ports:
+      - "5101:5432"
+    # Membuat volume untuk menyimpan data database secara persisten
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # Healthcheck untuk memastikan database siap menerima koneksi
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Mendefinisikan volume yang akan digunakan oleh service 'db'
+volumes:
+  postgres-data:
