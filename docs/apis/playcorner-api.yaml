@@ -369,8 +369,6 @@ components:
           type: "integer"
         status:
           type: "string"
-        data:
-          type: "object"
 
     ApiResponseTokenCarrier:
       allOf:
