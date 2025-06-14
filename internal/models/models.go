@@ -66,8 +66,15 @@ type TokenCarrier struct {
 	ExpireDate string `json:"expireDate"`
 }
 
+type PagedData struct {
+	Offset int64 `json:"offset"`
+	Limit  int64 `json:"limit"`
+	Total  int64 `json:"total"`
+	Data   any   `json:"data"`
+}
+
 type History struct {
-	ID                  int    `json:"id"`
+	ID                  uint   `json:"id"`
 	TVID                int    `json:"tvId"`
 	ReservationDateTime string `json:"reservationDateTime"`
 	TVPictURL           string `json:"tvPictUrl"`

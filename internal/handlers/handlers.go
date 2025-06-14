@@ -129,28 +129,58 @@ func GetUser(c *fiber.Ctx) error {
 // GetUserHistories retrieves a user's reservation history
 func GetUserHistories(c *fiber.Ctx) error {
 	userID := c.Params("userId")
-	var reservations []models.Reservation
+	limitStr := c.Query("limit", "10")
+	offsetStr := c.Query("offset", "0")
 
-	if err := database.DB.Where("borrower_id = ?", userID).Order("created_at desc").Find(&reservations).Error; err != nil {
+	limit, err := strconv.ParseInt(limitStr, 10, 64)
+	if err != nil {
+		limit = 10
+	}
+	offset, err := strconv.ParseInt(offsetStr, 10, 64)
+	if err != nil {
+		offset = 0
+	}
+
+	var reservations []models.Reservation
+	var total int64
+
+	if err := database.DB.Model(&models.Reservation{}).Where("borrower_id = ?", userID).Count(&total).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorResponse{
-			Code: 500, Status: "SERVER_ERROR", Data: models.ErrorData{ErrorMsg: "Could not fetch user histories"},
+			Code:   500,
+			Status: "SERVER_ERROR",
+			Data:   models.ErrorData{ErrorMsg: "Could not count user histories"},
 		})
 	}
 
-	var histories []models.History
+	if err := database.DB.Where("borrower_id = ?", userID).Order("created_at desc").Limit(int(limit)).Offset(int(offset)).Find(&reservations).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorResponse{
+			Code:   500,
+			Status: "SERVER_ERROR",
+			Data:   models.ErrorData{ErrorMsg: "Could not fetch user histories"},
+		})
+	}
+
+	histories := []models.History{}
 	for _, r := range reservations {
 		histories = append(histories, models.History{
-			ID:                  int(r.ID),
+			ID:                  r.ID,
 			TVID:                r.TVID,
 			ReservationDateTime: r.TimeSlot,
 			TVPictURL:           "https://placehold.co/600x400/?text=TV+" + strconv.Itoa(r.TVID),
 		})
 	}
 
+	pagedData := models.PagedData{
+		Offset: offset,
+		Limit:  limit,
+		Total:  total,
+		Data:   histories,
+	}
+
 	return c.Status(fiber.StatusOK).JSON(models.Response{
 		Code:   200,
 		Status: "OK",
-		Data:   histories,
+		Data:   pagedData,
 	})
 }
 

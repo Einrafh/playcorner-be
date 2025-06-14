@@ -103,6 +103,20 @@ paths:
           schema:
             type: "string"
             example: "235150207111062"
+        - name: "limit"
+          in: "query"
+          required: false
+          description: "Jumlah data yang ingin diambil per halaman."
+          schema:
+            type: "integer"
+            default: 10
+        - name: "offset"
+          in: "query"
+          required: false
+          description: "Indeks data mulai dari mana (untuk halaman selanjutnya)."
+          schema:
+            type: "integer"
+            default: 0
       responses:
         "200":
           description: "Riwayat berhasil diambil"
@@ -250,6 +264,26 @@ components:
           items:
             $ref: "#/components/schemas/Game"
 
+    PagedHistory:
+      type: "object"
+      properties:
+        offset:
+          type: "integer"
+          description: "Indeks data mulai dari mana."
+          example: 0
+        limit:
+          type: "integer"
+          description: "Jumlah data per halaman."
+          example: 10
+        total:
+          type: "integer"
+          description: "Total seluruh data riwayat yang dimiliki user."
+          example: 50
+        data:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/History'
+
     History:
       type: "object"
       properties:
@@ -363,6 +397,14 @@ components:
               type: "array"
               items:
                 $ref: '#/components/schemas/History'
+
+    ApiResponsePagedHistory:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: "object"
+          properties:
+            data:
+              $ref: '#/components/schemas/PagedHistory'
 
     ApiResponseTVInfoArray:
       allOf:
