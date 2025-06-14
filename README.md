@@ -20,7 +20,7 @@ Proyek ini dibangun menggunakan Go (dengan framework Fiber) dan berjalan di dala
 ## 📖 Dokumentasi API
 Dokumentasi API lengkap yang menjelaskan setiap *endpoint*, skema, dan contoh penggunaan dapat diakses di sini:
 
-**[Lihat Dokumentasi API PlayCorner](https://api.playcorner.einrafh.com/docs/introduction)**
+**[Lihat Dokumentasi API PlayCorner](https://documenter.getpostman.com/view/32139498/2sB2x6nXqb)**
 
 ### Menjalankan Dokumentasi Lokal
 Proyek dokumentasi API (dibuat dengan Zudoku) berada di dalam folder `/docs`. Untuk menjalankan atau membangunnya:

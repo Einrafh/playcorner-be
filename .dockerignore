@@ -26,3 +26,8 @@ Thumbs.db
 # Abaikan file-file konfigurasi IDE
 .idea
 .vscode
+
+# Abaikan folder node_modules dari dokumentasi
+docs/node_modules
+docs/dist
+docs/.zudoku
